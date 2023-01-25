@@ -1,14 +1,39 @@
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { FaUser } from "react-icons/fa";
+import { register, reset } from "../features/auth/authSlice";
+import Spinner from "../components/Spinner";
+
 function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     password2: "",
-  });
+  })
 
-  const { name, email, password, password2 } = formData;
+  const { name, email, password, password2 } = formData
+
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+
+  const {user, isLoading, isError, isSuccess, message} = useSelector(
+    (state) => state.auth
+  )
+
+  useEffect(() => {
+    if(isError){
+      toast.error(message)
+    }
+
+    if(isSuccess || user){
+      navigate('/')
+    }
+
+    dispatch(reset())
+  }, [user, isError, isSuccess, message, navigate, dispatch])
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -18,7 +43,23 @@ function Register() {
   }
 
   const onSubmit = (e) => {
-    e.preventDefaut()
+    // e.preventDefaut();
+
+    if (password !== password2){
+      toast.error('Password and Confirm Password do not match')
+    }
+    else{
+      const userData = {
+        name,
+        email,
+        password
+      }
+      dispatch(register(userData))
+    }
+  }
+
+  if(isLoading){
+    return <Spinner/>
   }
 
   return (
@@ -46,7 +87,7 @@ function Register() {
             </div>
             <div className="form-group">
                 <input
-                    type="text"
+                    type="email"
                     className="form-control"
                     name="email"
                     id="email"
@@ -57,7 +98,7 @@ function Register() {
             </div>
             <div className="form-group">
                 <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     name="password"
                     id="password"
@@ -68,7 +109,7 @@ function Register() {
             </div>
             <div className="form-group">
                 <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     name="password2"
                     id="password2"
@@ -82,7 +123,6 @@ function Register() {
                     Submit
                 </button>
             </div>
-
         </form>
       </section>
     </>
