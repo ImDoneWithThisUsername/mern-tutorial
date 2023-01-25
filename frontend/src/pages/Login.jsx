@@ -25,8 +25,10 @@ function Login() {
     }
 
     if(isSuccess || user){
+      console.log(isSuccess)
       navigate('/')
     }
+
     dispatch(reset())
   }, [user, isError, isSuccess, message, navigate, dispatch])
 
